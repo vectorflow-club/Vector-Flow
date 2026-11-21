@@ -992,6 +992,11 @@ th {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    /* The desktop rule sets align-items: center. In this column
+       layout that shrank every child to its content width and
+       centred it, so the header, links and account block floated
+       inset from the drawer edges. Stretch them to full width. */
+    align-items: stretch;
     padding: 0;
     gap: 0;
     background: linear-gradient(180deg, #171532 0%, #1f1b47 100%);
@@ -1014,7 +1019,7 @@ th {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
+    padding: 14px 16px 14px 20px;
     border-bottom: 1px solid rgb(85 68 184 / 25%);
     background: rgb(36 32 82 / 60%);
   }
@@ -1080,29 +1085,47 @@ th {
   .site-nav__links {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: 16px 14px;
+    align-items: stretch;
+    gap: 4px;
+    padding: 20px 14px 16px;
+  }
+
+  /* Small section label so the list reads as a menu, not loose text. */
+  .site-nav__links::before {
+    content: "Navigate";
+    padding: 0 14px 8px;
+    color: rgb(222 216 255 / 55%);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
 
   .site-nav__link {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    min-height: 44px;
+    min-height: 48px;
     padding: 0 14px;
-    border-radius: var(--radius-sm);
-    color: #ded8ff;
-    font-size: 14px;
-    font-weight: 500;
+    border-radius: 10px;
+    color: #e6e1ff;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
     text-align: left;
     text-decoration: none;
     transition: background-color 160ms ease, color 160ms ease;
   }
 
   .site-nav__link:hover {
-    background: rgb(85 68 184 / 20%);
+    background: rgb(85 68 184 / 22%);
     color: #ffffff;
     transform: none;
+  }
+
+  .site-nav__link:active {
+    background: rgb(85 68 184 / 38%);
+    color: #ffffff;
   }
 
   /* Active route indicator: highlighted with blue background, bold text, and teal dot */
@@ -1110,7 +1133,18 @@ th {
     background: var(--color-blue-700);
     color: #ffffff;
     font-weight: 700;
-    box-shadow: 0 4px 14px rgb(85 68 184 / 40%);
+    box-shadow: 0 6px 16px rgb(85 68 184 / 32%), inset 0 1px 0 rgb(255 255 255 / 12%);
+  }
+
+  /* The base focus ring is a mid purple, too faint on the dark
+     drawer. Use a light ring here so keyboard focus stays visible. */
+  .site-nav__link:focus-visible,
+  .site-nav__signin:focus-visible,
+  .site-drawer__close:focus-visible,
+  .site-account--drawer .site-account__signout:focus-visible,
+  .site-drawer__footer a:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgb(201 192 255 / 85%);
   }
 
   .site-nav__link.is-active::after {
@@ -1126,11 +1160,15 @@ th {
   .site-nav__account {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: 12px;
-    padding: 16px 18px;
+    /* Pushed to the bottom with the footer: sign in / sign out sits
+       within thumb reach and the drawer has no dead gap. */
+    margin-top: auto;
+    padding: 16px;
     border-top: 1px solid rgb(85 68 184 / 25%);
     border-left: 0;
-    background: rgb(23 21 50 / 80%);
+    background: transparent;
   }
 
   /* Drawer account: the desktop dropdown is hidden here; the
@@ -1198,9 +1236,11 @@ th {
      drawer ends on something useful instead of dead space. */
   .site-drawer__footer {
     display: block;
-    margin-top: auto;
-    padding: 16px 18px;
+    margin-top: 0;
+    /* Keep the email clear of the iPhone home indicator. */
+    padding: 14px 20px calc(16px + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid rgb(85 68 184 / 25%);
+    background: rgb(23 21 50 / 55%);
   }
 
   .site-drawer__footer a {
