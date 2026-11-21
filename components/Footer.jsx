@@ -1,12 +1,6 @@
 import Link from "next/link";
 import BrandLogo from "@/components/BrandLogo";
 
-// The deploy commit hash comes from Vercel at build time
-// (NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA, set automatically by Vercel).
-// It is shown only when the variable exists; locally it is unset
-// and nothing renders — never a placeholder.
-const commitSha = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
-
 export default function Footer() {
   return (
     <footer className="site-footer">
@@ -37,7 +31,6 @@ export default function Footer() {
       </div>
       <div className="site-footer__bottom">
         <p>© 2026 Vector Flow, VVCE · CSE (AI &amp; ML)</p>
-        {commitSha ? <p>Commit {commitSha.slice(0, 7)}</p> : null}
       </div>
     </footer>
   );
