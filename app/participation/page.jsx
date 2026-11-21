@@ -18,6 +18,7 @@ import {
   IconCheck,
   IconClose,
   IconExternalLink,
+  IconArrowRight,
 } from "@/components/icons";
 import { formatDisplayName } from "@/lib/names";
 
@@ -342,7 +343,7 @@ export default function Participation() {
           <h2>No registrations yet</h2>
           <p>Events you register for will appear here.</p>
           <p>No certificates yet.</p>
-          <Link href="/">Explore upcoming events</Link>
+          <Link className="signin-page__button" href="/">Explore upcoming events <IconArrowRight /></Link>
         </div>
       )}
 
@@ -477,7 +478,7 @@ export default function Participation() {
                     {r.status === "CANCELLED" && (
                       <div className="participation-card__notice">
                         <p>Cancelled{r.cancelledAt ? ` on ${new Date(r.cancelledAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })}` : ""}. You can register again for this event from its page, if registration is still open.</p>
-                        <Link href={`/events/${r.event.slug}`}>Register again</Link>
+                        <Link className="signin-page__button" href={`/events/${r.event.slug}`}>Register again <IconArrowRight /></Link>
                       </div>
                     )}
 

@@ -4,6 +4,12 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Skeleton from "@/components/Skeleton";
 import Toast, { useToast } from "@/components/Toast";
+import {
+  IconCheck,
+  IconClipboardList,
+  IconEdit,
+  IconGraduationCap,
+} from "@/components/icons";
 
 // Sprint 3 admin dashboard. For each event it shows counts: total,
 // paid and free, verified and pending payment, and present and
@@ -394,17 +400,21 @@ export default function Admin() {
             {event.status} - {event.counts ? event.counts.total : event._count ? event._count.registrations : 0} registrations
           </p>
           {event.counts && (
-            <p>
-              Paid: {event.counts.paid} - Free: {event.counts.free} - Verified: {event.counts.verified} -{" "}
-              Pending review: {event.counts.pendingReview} - Rejected: {event.counts.rejected} - Present:{" "}
-              {event.counts.present} - Absent: {event.counts.absent}
-            </p>
+            <ul className="admin-event-stats">
+              <li><strong>{event.counts.paid}</strong><span>Paid</span></li>
+              <li><strong>{event.counts.free}</strong><span>Free</span></li>
+              <li><strong>{event.counts.verified}</strong><span>Verified</span></li>
+              <li><strong>{event.counts.pendingReview}</strong><span>Pending review</span></li>
+              <li><strong>{event.counts.rejected}</strong><span>Rejected</span></li>
+              <li><strong>{event.counts.present}</strong><span>Present</span></li>
+              <li><strong>{event.counts.absent}</strong><span>Absent</span></li>
+            </ul>
           )}
           <p className="admin-event-actions">
-            <Link className="admin-event-action" href={`/admin/events/${event.slug}`}>Edit</Link>
-            <button className="admin-event-action" onClick={() => loadRegistrations(event)}>Show registrations</button>
-            <Link className="admin-event-action" href={`/admin/events/${event.id}/attendance`}>Attendance</Link>
-            <Link className="admin-event-action" href={`/admin/events/${event.id}/certificates`}>Certificates</Link>
+            <Link className="admin-event-action" href={`/admin/events/${event.slug}`}><IconEdit /> Edit</Link>
+            <button className="admin-event-action" onClick={() => loadRegistrations(event)}><IconClipboardList /> Show registrations</button>
+            <Link className="admin-event-action" href={`/admin/events/${event.id}/attendance`}><IconCheck /> Attendance</Link>
+            <Link className="admin-event-action" href={`/admin/events/${event.id}/certificates`}><IconGraduationCap /> Certificates</Link>
           </p>
         </article>
       ))}

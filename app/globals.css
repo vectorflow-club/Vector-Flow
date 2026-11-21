@@ -3617,6 +3617,37 @@ th {
   font-size: 13px;
 }
 
+/* Per-event counts as a tidy grid of label + number cells, same
+   shape as the "At a glance" counts above: a big number over a
+   small muted label. Replaces the old hyphen-separated wall of
+   text ("Paid: 0 - Free: 0 - ..."). */
+.admin-event-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-event-stats li {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.admin-event-stats strong {
+  display: block;
+  font-size: 1.25rem;
+  color: var(--color-navy-950);
+}
+
+.admin-event-stats span {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
 .admin-event-actions {
   display: flex;
   flex-wrap: wrap;
@@ -3634,6 +3665,7 @@ th {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   min-height: 44px;
   padding: 9px 15px;
   border: 1px solid var(--color-border-strong);
@@ -3661,9 +3693,13 @@ th {
 }
 
 @media (max-width: 700px) {
-  .admin-event-actions {
-    flex-direction: column;
-    align-items: stretch;
+  /* Two actions per row on phones instead of four full-width bars
+     stacked on top of each other: each action takes half the row
+     (minus half the 8px gap), so Edit sits next to Show
+     registrations and Attendance next to Certificates. */
+  .admin-event-action {
+    flex: 1 1 calc(50% - 4px);
+    text-align: center;
   }
 }
 
