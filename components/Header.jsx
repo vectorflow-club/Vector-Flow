@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import BrandLogo from "@/components/BrandLogo";
-import { IconMenu, IconClose, IconChevronDown } from "@/components/icons";
+import MobileTabBar from "@/components/MobileTabBar";
+import { IconChevronDown } from "@/components/icons";
 import { formatDisplayName, initialsFor } from "@/lib/names";
 
 // Admin redesign: the server layout passes the signed-in user
@@ -20,12 +21,12 @@ import { formatDisplayName, initialsFor } from "@/lib/names";
 // header as plain grey text next to a bare Sign out button. Now the
 // desktop header shows an avatar button (initials + cased name);
 // tapping it opens a small menu with the name, email and Sign out.
-// In the mobile drawer the same account shows as a static block
-// under the links instead — the drawer is the menu there, so no
-// second dropdown is needed.
+// On mobile there is no header account area at all: navigation is
+// a fixed bottom tab bar (MobileTabBar), and its Profile tab opens
+// a sheet with the same account block, Participation, Admin and
+// Sign out. The old hamburger + drawer are gone.
 export default function Header({ initialUser = null }) {
   const [user, setUser] = useState(initialUser);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -60,9 +61,9 @@ export default function Header({ initialUser = null }) {
     };
   }, [pathname]);
 
-  // Automatically close menu when navigating to another route
+  // Automatically close the account menu when navigating to
+  // another route.
   useEffect(() => {
-    setMenuOpen(false);
     setAccountOpen(false);
   }, [pathname]);
 
@@ -77,27 +78,6 @@ export default function Header({ initialUser = null }) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  // Handle escape key and body scroll lock when mobile overlay is active
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === "Escape" && menuOpen) {
-        setMenuOpen(false);
-      }
-    }
-
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleKeyDown);
-    } else {
-      document.body.style.overflow = "";
-    }
-
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [menuOpen]);
 
   // Close the account menu on Escape (returning focus to the avatar
   // button) and on any click outside the menu.
@@ -122,10 +102,6 @@ export default function Header({ initialUser = null }) {
     };
   }, [accountOpen]);
 
-  const closeMenu = useCallback(() => {
-    setMenuOpen(false);
-  }, []);
-
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
     window.location.href = "/";
@@ -137,9 +113,10 @@ export default function Header({ initialUser = null }) {
   }
 
   return (
+    <>
     <header className={`site-header${scrolled ? " is-scrolled" : ""}`}>
       <div className="site-header__inner">
-        <Link className="site-brand" href="/" aria-label="Vector Flow home" onClick={closeMenu}>
+        <Link className="site-brand" href="/" aria-label="Vector Flow home">
           <BrandLogo className="site-brand__logo" priority />
           <span className="site-brand__copy">
             <strong>Vector Flow</strong>
@@ -147,73 +124,34 @@ export default function Header({ initialUser = null }) {
           </span>
         </Link>
 
-        <button
-          className="site-menu-toggle"
-          type="button"
-          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
-          aria-expanded={menuOpen}
-          aria-controls="site-navigation"
-          onClick={() => setMenuOpen((open) => !open)}
-        >
-          {menuOpen ? <IconClose /> : <IconMenu />}
-        </button>
-
-        {/* Semi-transparent navy/slate backdrop: bg-slate-900/60 backdrop-blur-sm */}
-        <div
-          className={`site-nav-backdrop${menuOpen ? " is-open" : ""}`}
-          onClick={closeMenu}
-          aria-hidden="true"
-        />
-
-        {/* Floating/sliding overlay drawer on mobile */}
         <nav
-          className={`site-nav${menuOpen ? " is-open" : ""}`}
+          className="site-nav"
           id="site-navigation"
           aria-label="Main navigation"
         >
-          {/* Drawer header with brand slate/navy accents and 'X' close button */}
-          <div className="site-drawer__header">
-            <div className="site-drawer__brand">
-              <BrandLogo className="site-drawer__logo" />
-              <div className="site-drawer__copy">
-                <strong>Vector Flow</strong>
-                <span>VVCE · CSE (AI &amp; ML)</span>
-              </div>
-            </div>
-            <button
-              className="site-drawer__close"
-              type="button"
-              aria-label="Close navigation menu"
-              onClick={closeMenu}
-            >
-              <IconClose />
-            </button>
-          </div>
-
           <div className="site-nav__links">
-            <Link className={navLinkClass("/")} href="/" aria-current={pathname === "/" ? "page" : undefined} onClick={closeMenu}>
+            <Link className={navLinkClass("/")} href="/" aria-current={pathname === "/" ? "page" : undefined}>
               <span>Home</span>
             </Link>
-            <Link className={navLinkClass("/gallery")} href="/gallery" aria-current={pathname.startsWith("/gallery") ? "page" : undefined} onClick={closeMenu}>
+            <Link className={navLinkClass("/gallery")} href="/gallery" aria-current={pathname.startsWith("/gallery") ? "page" : undefined}>
               <span>Gallery</span>
             </Link>
-            <Link className={navLinkClass("/team")} href="/team" aria-current={pathname.startsWith("/team") ? "page" : undefined} onClick={closeMenu}>
+            <Link className={navLinkClass("/team")} href="/team" aria-current={pathname.startsWith("/team") ? "page" : undefined}>
               <span>Team</span>
             </Link>
-            <Link className={navLinkClass("/participation")} href="/participation" aria-current={pathname.startsWith("/participation") ? "page" : undefined} onClick={closeMenu}>
+            <Link className={navLinkClass("/participation")} href="/participation" aria-current={pathname.startsWith("/participation") ? "page" : undefined}>
               <span>Participation</span>
             </Link>
             {user && user.role === "ADMIN" && (
-              <Link className={navLinkClass("/admin")} href="/admin" aria-current={pathname.startsWith("/admin") ? "page" : undefined} onClick={closeMenu}>
+              <Link className={navLinkClass("/admin")} href="/admin" aria-current={pathname.startsWith("/admin") ? "page" : undefined}>
                 <span>Admin</span>
               </Link>
             )}
           </div>
 
           <div className="site-nav__account">
+            {/* Desktop: avatar button + dropdown menu. */}
             {user ? (
-              <>
-                {/* Desktop: avatar button + dropdown menu. */}
                 <div className="site-account site-account--desktop" ref={accountRef}>
                   <button
                     className="site-account__button"
@@ -252,49 +190,20 @@ export default function Header({ initialUser = null }) {
                     </div>
                   )}
                 </div>
-                {/* Mobile drawer: the same account as a static block
-                    under the links, no second dropdown. */}
-                <div className="site-account site-account--drawer">
-                  <div className="site-account__row">
-                    <span className="site-account__avatar" aria-hidden="true">
-                      {initialsFor(user.name)}
-                    </span>
-                    <div className="site-account__identity">
-                      <strong>{formatDisplayName(user.name)}</strong>
-                      <span>{user.email}</span>
-                    </div>
-                  </div>
-                  <button
-                    className="site-account__signout"
-                    type="button"
-                    onClick={() => {
-                      closeMenu();
-                      logout();
-                    }}
-                  >
-                    Sign out
-                  </button>
-                </div>
-              </>
             ) : (
               <Link
                 className="site-nav__signin"
                 href="/signin"
                 aria-current={pathname.startsWith("/signin") ? "page" : undefined}
-                onClick={closeMenu}
               >
                 Sign in
               </Link>
             )}
           </div>
-
-          {/* Drawer footer: club contact at the bottom of the drawer,
-              so the drawer ends on something useful instead of dead space. */}
-          <div className="site-drawer__footer">
-            <a href="mailto:vectorflow@vvce.ac.in">vectorflow@vvce.ac.in</a>
-          </div>
         </nav>
       </div>
     </header>
+    <MobileTabBar user={user} onSignOut={logout} />
+    </>
   );
 }
